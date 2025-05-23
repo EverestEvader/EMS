@@ -1,405 +1,28 @@
-// Enhanced Event Management System JavaScript
-
-// Global variables
-let isLoading = false;
-const ANIMATION_DURATION = 300;
-
-// DOM Ready
+// Main JavaScript for Corporate Event Hub
 document.addEventListener('DOMContentLoaded', function() {
-    initializeApp();
-});
-
-// Initialize the application
-function initializeApp() {
-    initializeNavigation();
-    initializeAlerts();
-    initializeForms();
-    initializeCards();
-    initializeModals();
-    initializeTooltips();
-    initializeScrollEffects();
-    setupEventListeners();
-}
-
-// Navigation enhancements
-function initializeNavigation() {
-    const navbar = document.querySelector('.navbar');
-    let lastScrollTop = 0;
-
-    // Navbar scroll effect
-    window.addEventListener('scroll', function() {
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        
-        if (scrollTop > lastScrollTop && scrollTop > 100) {
-            // Scrolling down
-            navbar.style.transform = 'translateY(-100%)';
-        } else {
-            // Scrolling up
-            navbar.style.transform = 'translateY(0)';
-        }
-        
-        lastScrollTop = scrollTop;
-    });
-
-    // Mobile menu toggle enhancement
-    const navbarToggler = document.querySelector('.navbar-toggler');
-    const navbarCollapse = document.querySelector('.navbar-collapse');
     
-    if (navbarToggler && navbarCollapse) {
-        navbarToggler.addEventListener('click', function() {
-            // Add smooth animation
-            navbarCollapse.style.transition = 'height 0.3s ease-in-out';
-        });
-    }
-
-    // Active link highlighting
-    highlightActiveNavLink();
-}
-
-// Highlight active navigation link
-function highlightActiveNavLink() {
-    const currentPath = window.location.pathname;
-    const navLinks = document.querySelectorAll('.nav-link');
-    
-    navLinks.forEach(link => {
-        const linkPath = new URL(link.href).pathname;
-        if (linkPath === currentPath || (currentPath.startsWith(linkPath) && linkPath !== '/')) {
-            link.classList.add('active');
-        } else {
-            link.classList.remove('active');
-        }
-    });
-}
-
-// Alert system enhancements
-function initializeAlerts() {
-    const alerts = document.querySelectorAll('.alert');
-    
-    alerts.forEach(alert => {
-        // Add icons to alerts
-        addAlertIcon(alert);
-        
-        // Auto-dismiss alerts after 5 seconds
-        if (alert.classList.contains('alert-dismissible')) {
-            setTimeout(() => {
-                dismissAlert(alert);
-            }, 5000);
-        }
-    });
-}
-
-// Add appropriate icon to alerts
-function addAlertIcon(alert) {
-    let icon = '';
-    
-    if (alert.classList.contains('alert-success')) {
-        icon = '<i class="fas fa-check-circle me-2"></i>';
-    } else if (alert.classList.contains('alert-danger')) {
-        icon = '<i class="fas fa-exclamation-circle me-2"></i>';
-    } else if (alert.classList.contains('alert-warning')) {
-        icon = '<i class="fas fa-exclamation-triangle me-2"></i>';
-    } else if (alert.classList.contains('alert-info')) {
-        icon = '<i class="fas fa-info-circle me-2"></i>';
-    }
-    
-    if (icon && !alert.querySelector('i')) {
-        alert.innerHTML = icon + alert.innerHTML;
-    }
-}
-
-// Dismiss alert with animation
-function dismissAlert(alert) {
-    alert.style.opacity = '0';
-    alert.style.transform = 'translateX(100%)';
-    
-    setTimeout(() => {
-        if (alert.parentNode) {
-            alert.parentNode.removeChild(alert);
-        }
-    }, ANIMATION_DURATION);
-}
-
-// Form enhancements
-function initializeForms() {
-    const forms = document.querySelectorAll('form');
-    
-    forms.forEach(form => {
-        // Add loading states to submit buttons
-        setupFormSubmission(form);
-        
-        // Enhanced validation
-        setupFormValidation(form);
-        
-        // Floating labels
-        setupFloatingLabels(form);
-    });
-    
-    // Date/time inputs enhancement
-    setupDateTimeInputs();
-}
-
-// Setup form submission with loading state
-function setupFormSubmission(form) {
-    const submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
-    
-    if (submitBtn) {
-        form.addEventListener('submit', function() {
-            if (!isLoading) {
-                isLoading = true;
-                setButtonLoading(submitBtn, true);
-                
-                // Reset loading state after 10 seconds as fallback
-                setTimeout(() => {
-                    setButtonLoading(submitBtn, false);
-                    isLoading = false;
-                }, 10000);
-            }
-        });
-    }
-}
-
-// Set button loading state
-function setButtonLoading(button, loading) {
-    const originalText = button.getAttribute('data-original-text') || button.textContent;
-    
-    if (loading) {
-        button.setAttribute('data-original-text', originalText);
-        button.innerHTML = '<span class="spinner me-2"></span>Loading...';
-        button.disabled = true;
-    } else {
-        button.innerHTML = originalText;
-        button.disabled = false;
-    }
-}
-
-// Enhanced form validation
-function setupFormValidation(form) {
-    const inputs = form.querySelectorAll('input, select, textarea');
-    
-    inputs.forEach(input => {
-        input.addEventListener('blur', function() {
-            validateField(input);
-        });
-        
-        input.addEventListener('input', function() {
-            // Clear validation errors on input
-            clearFieldValidation(input);
-        });
-    });
-}
-
-// Validate individual field
-function validateField(field) {
-    const value = field.value.trim();
-    const type = field.type;
-    let isValid = true;
-    let message = '';
-    
-    // Check required fields
-    if (field.hasAttribute('required') && !value) {
-        isValid = false;
-        message = 'This field is required.';
-    }
-    
-    // Email validation
-    if (type === 'email' && value && !isValidEmail(value)) {
-        isValid = false;
-        message = 'Please enter a valid email address.';
-    }
-    
-    // Password validation
-    if (type === 'password' && value && value.length < 8) {
-        isValid = false;
-        message = 'Password must be at least 8 characters long.';
-    }
-    
-    // Update field validation state
-    updateFieldValidation(field, isValid, message);
-    
-    return isValid;
-}
-
-// Update field validation state
-function updateFieldValidation(field, isValid, message) {
-    const feedbackElement = field.parentNode.querySelector('.invalid-feedback');
-    
-    if (isValid) {
-        field.classList.remove('is-invalid');
-        field.classList.add('is-valid');
-        if (feedbackElement) {
-            feedbackElement.textContent = '';
-        }
-    } else {
-        field.classList.remove('is-valid');
-        field.classList.add('is-invalid');
-        if (feedbackElement) {
-            feedbackElement.textContent = message;
-        }
-    }
-}
-
-// Clear field validation
-function clearFieldValidation(field) {
-    field.classList.remove('is-valid', 'is-invalid');
-    const feedbackElement = field.parentNode.querySelector('.invalid-feedback');
-    if (feedbackElement) {
-        feedbackElement.textContent = '';
-    }
-}
-
-// Email validation helper
-function isValidEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-}
-
-// Setup floating labels
-function setupFloatingLabels(form) {
-    const floatingGroups = form.querySelectorAll('.form-floating');
-    
-    floatingGroups.forEach(group => {
-        const input = group.querySelector('input, select, textarea');
-        const label = group.querySelector('label');
-        
-        if (input && label) {
-            // Set placeholder for floating effect
-            if (!input.placeholder) {
-                input.placeholder = ' ';
-            }
-            
-            // Handle initial state
-            updateFloatingLabel(input, label);
-            
-            // Handle focus/blur events
-            input.addEventListener('focus', () => updateFloatingLabel(input, label));
-            input.addEventListener('blur', () => updateFloatingLabel(input, label));
-            input.addEventListener('input', () => updateFloatingLabel(input, label));
-        }
-    });
-}
-
-// Update floating label state
-function updateFloatingLabel(input, label) {
-    const hasValue = input.value.length > 0;
-    const isFocused = document.activeElement === input;
-    
-    if (hasValue || isFocused) {
-        label.classList.add('active');
-    } else {
-        label.classList.remove('active');
-    }
-}
-
-// Setup date/time inputs
-function setupDateTimeInputs() {
-    const dateInputs = document.querySelectorAll('input[type="datetime-local"]');
-    
-    dateInputs.forEach(input => {
-        // Set minimum date to today
-        const now = new Date();
-        const minDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
-        input.min = minDate.toISOString().slice(0, 16);
-    });
-}
-
-// Card enhancements
-function initializeCards() {
-    const cards = document.querySelectorAll('.card');
-    
-    cards.forEach(card => {
-        // Add hover effects
-        addCardHoverEffect(card);
-        
-        // Lazy load images in cards
-        lazyLoadCardImages(card);
-    });
-}
-
-// Add hover effects to cards
-function addCardHoverEffect(card) {
-    card.addEventListener('mouseenter', function() {
-        this.style.transform = 'translateY(-4px)';
-        this.style.boxShadow = 'var(--shadow-xl)';
-    });
-    
-    card.addEventListener('mouseleave', function() {
-        this.style.transform = 'translateY(0)';
-        this.style.boxShadow = 'var(--shadow)';
-    });
-}
-
-// Lazy load images in cards
-function lazyLoadCardImages(card) {
-    const images = card.querySelectorAll('img[data-src]');
-    
-    const imageObserver = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const img = entry.target;
-                img.src = img.dataset.src;
-                img.removeAttribute('data-src');
-                observer.unobserve(img);
-            }
-        });
-    });
-    
-    images.forEach(img => imageObserver.observe(img));
-}
-
-// Modal enhancements
-function initializeModals() {
-    const modalTriggers = document.querySelectorAll('[data-bs-toggle="modal"]');
-    
-    modalTriggers.forEach(trigger => {
-        trigger.addEventListener('click', function() {
-            const targetModal = document.querySelector(this.getAttribute('data-bs-target'));
-            if (targetModal) {
-                // Add custom modal animations
-                targetModal.style.display = 'block';
-                targetModal.classList.add('show');
-                setTimeout(() => {
-                    targetModal.querySelector('.modal-dialog').style.transform = 'translateY(0)';
-                }, 10);
-            }
-        });
-    });
-}
-
-// Tooltip initialization
-function initializeTooltips() {
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
-}
 
-// Scroll effects
-function initializeScrollEffects() {
-    const elementsToAnimate = document.querySelectorAll('.card, .stat-card, .alert');
-    
-    const animationObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-            }
+    // Initialize popovers
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+        return new bootstrap.Popover(popoverTriggerEl);
+    });
+
+    // Auto-hide alerts after 5 seconds
+    setTimeout(function() {
+        var alerts = document.querySelectorAll('.alert:not(.alert-permanent)');
+        alerts.forEach(function(alert) {
+            var bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
         });
-    }, {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    });
-    
-    elementsToAnimate.forEach(element => {
-        element.style.opacity = '0';
-        element.style.transform = 'translateY(20px)';
-        element.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
-        animationObserver.observe(element);
-    });
-}
+    }, 5000);
 
-// Setup additional event listeners
-function setupEventListeners() {
-    // Smooth scroll for anchor links
+    // Smooth scrolling for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
@@ -412,129 +35,282 @@ function setupEventListeners() {
             }
         });
     });
-    
-    // Copy to clipboard functionality
-    document.querySelectorAll('[data-clipboard]').forEach(button => {
-        button.addEventListener('click', function() {
-            const text = this.getAttribute('data-clipboard');
-            navigator.clipboard.writeText(text).then(() => {
-                showToast('Copied to clipboard!', 'success');
-            });
+
+    // Form validation enhancement
+    const forms = document.querySelectorAll('.needs-validation');
+    forms.forEach(form => {
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
         });
     });
-    
-    // Confirmation dialogs
-    document.querySelectorAll('[data-confirm]').forEach(element => {
-        element.addEventListener('click', function(e) {
-            const message = this.getAttribute('data-confirm');
-            if (!confirm(message)) {
+
+    // Search functionality enhancement
+    const searchInput = document.getElementById('search');
+    if (searchInput) {
+        let searchTimeout;
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(function() {
+                // Could add live search functionality here
+            }, 300);
+        });
+    }
+
+    // Event registration confirmation
+    const registerButtons = document.querySelectorAll('.btn-register');
+    registerButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            if (!confirm('Are you sure you want to register for this event?')) {
                 e.preventDefault();
             }
         });
     });
-}
 
-// Show toast notification
-function showToast(message, type = 'info') {
-    const toast = document.createElement('div');
-    toast.className = `alert alert-${type} toast-notification`;
-    toast.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 9999;
-        min-width: 300px;
-        opacity: 0;
-        transform: translateX(100%);
-        transition: all 0.3s ease-in-out;
-    `;
-    toast.innerHTML = message;
-    
-    document.body.appendChild(toast);
-    
-    // Trigger animation
-    setTimeout(() => {
-        toast.style.opacity = '1';
-        toast.style.transform = 'translateX(0)';
-    }, 10);
-    
-    // Auto remove
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(100%)';
-        setTimeout(() => {
-            if (toast.parentNode) {
-                toast.parentNode.removeChild(toast);
+    // Event deletion confirmation
+    const deleteButtons = document.querySelectorAll('.btn-delete');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            if (!confirm('Are you sure you want to delete this event? This action cannot be undone.')) {
+                e.preventDefault();
             }
-        }, 300);
-    }, 3000);
-}
+        });
+    });
+
+    // File upload preview
+    const fileInputs = document.querySelectorAll('input[type="file"]');
+    fileInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Show preview if it's an image
+                    if (file.type.startsWith('image/')) {
+                        let preview = document.getElementById('file-preview');
+                        if (!preview) {
+                            preview = document.createElement('div');
+                            preview.id = 'file-preview';
+                            preview.className = 'mt-2';
+                            input.parentNode.appendChild(preview);
+                        }
+                        preview.innerHTML = `
+                            <img src="${e.target.result}" alt="Preview" 
+                                 style="max-width: 200px; max-height: 200px; border-radius: 8px;">
+                            <p class="text-muted mt-1">${file.name}</p>
+                        `;
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    });
+
+    // Loading states for buttons
+    const loadingButtons = document.querySelectorAll('.btn-loading');
+    loadingButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const originalText = this.innerHTML;
+            this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading...';
+            this.disabled = true;
+            
+            // Re-enable after 5 seconds (fallback)
+            setTimeout(() => {
+                this.innerHTML = originalText;
+                this.disabled = false;
+            }, 5000);
+        });
+    });
+
+    // Dynamic form fields
+    const addFieldButtons = document.querySelectorAll('.add-field');
+    addFieldButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const template = this.dataset.template;
+            const container = document.getElementById(this.dataset.container);
+            if (template && container) {
+                const newField = document.createElement('div');
+                newField.innerHTML = template;
+                container.appendChild(newField.firstElementChild);
+            }
+        });
+    });
+
+    // Countdown timers for events
+    const countdownElements = document.querySelectorAll('.countdown');
+    countdownElements.forEach(element => {
+        const eventDate = new Date(element.dataset.date);
+        
+        function updateCountdown() {
+            const now = new Date();
+            const timeLeft = eventDate - now;
+            
+            if (timeLeft > 0) {
+                const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                
+                element.innerHTML = `${days}d ${hours}h ${minutes}m`;
+            } else {
+                element.innerHTML = 'Event Started';
+                element.classList.add('text-success');
+            }
+        }
+        
+        updateCountdown();
+        setInterval(updateCountdown, 60000); // Update every minute
+    });
+
+    // Copy to clipboard functionality
+    const copyButtons = document.querySelectorAll('.copy-to-clipboard');
+    copyButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const text = this.dataset.text || this.textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                }, 2000);
+            });
+        });
+    });
+
+    // Dark mode toggle (if implemented)
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+        });
+
+        // Load saved dark mode preference
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+        }
+    }
+
+    // Infinite scroll for event lists (if needed)
+    let page = 1;
+    let loading = false;
+    
+    function loadMoreEvents() {
+        if (loading) return;
+        loading = true;
+        
+        // Implementation would depend on backend pagination
+        // This is a placeholder for future enhancement
+        
+        loading = false;
+    }
+
+    // Check if we're near the bottom of the page
+    window.addEventListener('scroll', function() {
+        if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 1000) {
+            // loadMoreEvents(); // Uncomment when pagination is implemented
+        }
+    });
+
+    // Enhanced form validation messages
+    const inputs = document.querySelectorAll('input, textarea, select');
+    inputs.forEach(input => {
+        input.addEventListener('invalid', function() {
+            this.setCustomValidity('');
+            if (!this.validity.valid) {
+                if (this.validity.valueMissing) {
+                    this.setCustomValidity('This field is required.');
+                } else if (this.validity.typeMismatch) {
+                    this.setCustomValidity('Please enter a valid ' + this.type + '.');
+                } else if (this.validity.tooShort) {
+                    this.setCustomValidity('Please enter at least ' + this.minLength + ' characters.');
+                } else if (this.validity.tooLong) {
+                    this.setCustomValidity('Please enter no more than ' + this.maxLength + ' characters.');
+                }
+            }
+        });
+
+        input.addEventListener('input', function() {
+            this.setCustomValidity('');
+        });
+    });
+
+    // Animation observer for fade-in effects
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('fade-in');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    // Observe elements for animation
+    const animatedElements = document.querySelectorAll('.animate-on-scroll');
+    animatedElements.forEach(element => {
+        observer.observe(element);
+    });
+});
 
 // Utility functions
-const utils = {
-    // Format date
-    formatDate: function(date) {
-        return new Date(date).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-    },
+function showToast(message, type = 'info') {
+    const toastContainer = document.getElementById('toast-container') || createToastContainer();
+    const toast = document.createElement('div');
+    toast.className = `toast align-items-center text-white bg-${type} border-0`;
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'assertive');
+    toast.setAttribute('aria-atomic', 'true');
     
-    // Format currency
-    formatCurrency: function(amount) {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD'
-        }).format(amount);
-    },
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">${message}</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    `;
     
-    // Debounce function
-    debounce: function(func, wait) {
-        let timeout;
-        return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
-    },
+    toastContainer.appendChild(toast);
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
     
-    // Throttle function
-    throttle: function(func, limit) {
-        let inThrottle;
-        return function() {
-            const args = arguments;
-            const context = this;
-            if (!inThrottle) {
-                func.apply(context, args);
-                inThrottle = true;
-                setTimeout(() => inThrottle = false, limit);
-            }
-        };
-    }
-};
-
-// Make utils globally available
-window.eventManagementUtils = utils;
-
-// Service Worker registration for PWA capabilities
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-        navigator.serviceWorker.register('/static/js/sw.js').then(function(registration) {
-            console.log('ServiceWorker registration successful');
-        }, function(err) {
-            console.log('ServiceWorker registration failed');
-        });
+    toast.addEventListener('hidden.bs.toast', function() {
+        toast.remove();
     });
 }
 
-// Export functions for use in other modules
-window.eventManagement = {
-    showToast,
-    setButtonLoading,
-    validateField,
-    utils
-};
+function createToastContainer() {
+    const container = document.createElement('div');
+    container.id = 'toast-container';
+    container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+    container.style.zIndex = '1100';
+    document.body.appendChild(container);
+    return container;
+}
+
+function formatDate(date) {
+    return new Intl.DateTimeFormat('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    }).format(new Date(date));
+}
+
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
