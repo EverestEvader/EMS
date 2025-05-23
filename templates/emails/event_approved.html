@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Approved: {{ event.name }}</title>
+    <style>
+        /* Email styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+        
+        .email-container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin: 20px;
+        }
+        
+        .email-header {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        .email-header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .email-header .icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .email-body {
+            padding: 30px 20px;
+        }
+        
+        .greeting {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333333;
+            margin-bottom: 20px;
+        }
+        
+        .content {
+            margin-bottom: 20px;
+            color: #666666;
+        }
+        
+        .approval-highlight {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border: 1px solid #28a745;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin: 25px 0;
+        }
+        
+        .approval-highlight .status {
+            font-size: 24px;
+            font-weight: 700;
+            color: #155724;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .approval-highlight .status-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: #155724;
+            margin: 0;
+        }
+        
+        .event-details {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-left: 4px solid #28a745;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+        
+        .event-details h3 {
+            color: #28a745;
+            margin: 0 0 15px 0;
+            font-size: 18px;
+        }
+        
+        .detail-row {
+            display: flex;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        
+        .detail-icon {
+            width: 20px;
+            margin-right: 10px;
+            text-align: center;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #333333;
+            min-width: 80px;
+            margin-right: 10px;
+        }
+        
+        .detail-value {
+            color: #666666;
+            flex: 1;
+        }
+        
+        .view-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+            margin: 20px 0;
+            box-shadow: 0 4px 6px rgba(0, 123, 255, 0.3);
+        }
+        
+        .button-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .next-steps-box {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-left: 4px solid #17a2b8;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .next-steps-box .steps-title {
+            font-weight: 600;
+            color: #0c5460;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        
+        .step-item {
+            color: #0c5460;
+            margin: 10px 0;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .step-number {
+            background-color: #17a2b8;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+        
+        .email-footer {
+            background-color: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .footer-text {
+            color: #6c757d;
+            font-size: 12px;
+            margin: 0;
+        }
+        
+        .company-info {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .company-info h3 {
+            color: #28a745;
+            margin: 0 0 10px 0;
+            font-size: 18px;
+        }
+        
+        .contact-info {
+            color: #6c757d;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+        
+        /* Responsive */
+        @media only screen and (max-width: 600px) {
+            .email-container {
+                margin: 10px;
+                border-radius: 0;
+            }
+            
+            .email-header,
+            .email-body {
+                padding: 20px 15px;
+            }
+            
+            .email-header h1 {
+                font-size: 20px;
+            }
+            
+            .approval-highlight .status {
+                font-size: 20px;
+            }
+            
+            .detail-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .detail-label {
+                min-width: auto;
+                margin-bottom: 5px;
+            }
+            
+            .view-button {
+                display: block;
+                margin: 20px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="email-header">
+            <span class="icon">🎉</span>
+            <h1>Event Approved!</h1>
+        </div>
+        
+        <!-- Body -->
+        <div class="email-body">
+            <div class="greeting">
+                Hello {{ user.username }},
+            </div>
+            
+            <div class="content">
+                <p>Fantastic news! Your event <strong>{{ event.name }}</strong> has been <strong>approved</strong> by our admin team and is now live on our platform!</p>
+            </div>
+            
+            <div class="approval-highlight">
+                <span class="status">✅ APPROVED</span>
+                <p class="status-text">Your event is now visible to all users and accepting registrations</p>
+            </div>
+            
+            <div class="event-details">
+                <h3>📅 Your Approved Event</h3>
+                
+                <div class="detail-row">
+                    <span class="detail-icon">🎉</span>
+                    <span class="detail-label">Event:</span>
+                    <span class="detail-value">{{ event.name }}</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-icon">📅</span>
+                    <span class="detail-label">Date:</span>
+                    <span class="detail-value">{{ event.date.strftime('%A, %B %d, %Y') }}</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-icon">🕐</span>
+                    <span class="detail-label">Time:</span>
+                    <span class="detail-value">{{ event.date.strftime('%I:%M %p') }} - {{ event.end_date.strftime('%I:%M %p') }}</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-icon">📍</span>
+                    <span class="detail-label">Venue:</span>
+                    <span class="detail-value">{{ event.venue }}</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-icon">🎫</span>
+                    <span class="detail-label">Tickets:</span>
+                    <span class="detail-value">{{ event.total_tickets }} available</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-icon">💰</span>
+                    <span class="detail-label">Price:</span>
+                    <span class="detail-value">
+                        {% if event.is_free %}Free{% else %} ${{ "%.2f"|format(event.price) }}{% endif %}
+                    </span>
+                </div>
+            </div>
+            
+            <div class="button-container">
+                <a href="{{ event_url }}" class="view-button">View Your Live Event</a>
+            </div>
+            
+            <div class="next-steps-box">
+                <div class="steps-title">🚀 What Happens Next?</div>
+                
+                <div class="step-item">
+                    <span class="step-number">1</span>
+                    <span>Your event is now visible in our public event listings</span>
+                </div>
+                
+                <div class="step-item">
+                    <span class="step-number">2</span>
+                    <span>Users can view details and register for your event</span>
+                </div>
+                
+                <div class="step-item">
+                    <span class="step-number">3</span>
+                    <span>You'll receive email notifications for new registrations</span>
+                </div>
+                
+                <div class="step-item">
+                    <span class="step-number">4</span>
+                    <span>Monitor your event progress from the Creator Dashboard</span>
+                </div>
+                
+                <div class="step-item">
+                    <span class="step-number">5</span>
+                    <span>We'll send reminder emails to attendees before the event</span>
+                </div>
+            </div>
+            
+            <div class="content">
+                <p><strong>Tips for Success:</strong></p>
+                <ul>
+                    <li>Share your event link on social media and with colleagues</li>
+                    <li>Monitor registrations and engage with attendees</li>
+                    <li>Update event details if anything changes</li>
+                    <li>Prepare materials and logistics for the big day</li>
+                </ul>
+                
+                <p>Thank you for choosing Corporate Event Hub to organize your event. We're excited to see it succeed!</p>
+                
+                <p><strong>The Corporate Event Hub Team</strong></p>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="email-footer">
+            <div class="company-info">
+                <h3>Corporate Event Hub</h3>
+                <div class="contact-info">
+                    📧 support@corporateeventhub.com<br>
+                    📞 +1 (555) 123-4567<br>
+                    📍 123 Business Ave, Suite 100, Corporate City, BC 12345
+                </div>
+            </div>
+            
+            <p class="footer-text">
+                This notification was sent to {{ user.email }}.<br>
+                If you have any questions about managing your event, please contact our support team.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

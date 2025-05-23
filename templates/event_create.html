@@ -1,0 +1,475 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if is_edit %}Edit Event{% else %}Create Event{% endif %} - Corporate Event Hub
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex align-items-center mb-3">
+                <a href="{% if current_user.is_admin() %}{{ url_for('admin_panel') }}{% else %}{{ url_for('dashboard_creator') }}{% endif %}" 
+                   class="btn btn-outline-secondary me-3">
+                    <i class="fas fa-arrow-left me-2"></i>Back
+                </a>
+                <div>
+                    <h1 class="display-6 fw-bold mb-0">
+                        {% if is_edit %}
+                            <i class="fas fa-edit me-2 text-warning"></i>Edit Event
+                        {% else %}
+                            <i class="fas fa-plus me-2 text-primary"></i>Create New Event
+                        {% endif %}
+                    </h1>
+                    <p class="text-muted mb-0">
+                        {% if is_edit %}
+                            Update your event details and settings
+                        {% else %}
+                            Fill in the details to create your corporate event
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" novalidate>
+        {{ form.hidden_tag() }}
+        
+        <div class="row g-4">
+            <!-- Main Form -->
+            <div class="col-lg-8">
+                <!-- Basic Information -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-info-circle me-2 text-primary"></i>
+                            Basic Information
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else ""), placeholder="Event Name") }}
+                                    {{ form.name.label(class="form-label") }}
+                                    {% if form.name.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.name.errors %}{{ error }}{% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="col-12">
+                                <label for="{{ form.description.id }}" class="form-label fw-semibold">
+                                    {{ form.description.label.text }}
+                                </label>
+                                {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else ""), rows="4", placeholder="Describe your event in detail...") }}
+                                {% if form.description.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.description.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">
+                                    <small class="text-muted">
+                                        <i class="fas fa-lightbulb me-1"></i>
+                                        Include event objectives, agenda highlights, and what attendees can expect
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Date and Time -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-calendar-alt me-2 text-success"></i>
+                            Date & Time
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.date.id }}" class="form-label fw-semibold">
+                                    {{ form.date.label.text }}
+                                </label>
+                                {{ form.date(class="form-control" + (" is-invalid" if form.date.errors else "")) }}
+                                {% if form.date.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.date.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="{{ form.end_date.id }}" class="form-label fw-semibold">
+                                    {{ form.end_date.label.text }}
+                                </label>
+                                {{ form.end_date(class="form-control" + (" is-invalid" if form.end_date.errors else "")) }}
+                                {% if form.end_date.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.end_date.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event Details -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-cog me-2 text-info"></i>
+                            Event Details
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    {{ form.venue(class="form-control" + (" is-invalid" if form.venue.errors else ""), placeholder="Event Venue") }}
+                                    {{ form.venue.label(class="form-label") }}
+                                    {% if form.venue.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.venue.errors %}{{ error }}{% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="{{ form.event_type.id }}" class="form-label fw-semibold">
+                                    {{ form.event_type.label.text }}
+                                </label>
+                                {{ form.event_type(class="form-select" + (" is-invalid" if form.event_type.errors else "")) }}
+                                {% if form.event_type.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.event_type.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="{{ form.dress_code.id }}" class="form-label fw-semibold">
+                                    {{ form.dress_code.label.text }}
+                                </label>
+                                {{ form.dress_code(class="form-select" + (" is-invalid" if form.dress_code.errors else "")) }}
+                                {% if form.dress_code.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.dress_code.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="{{ form.location_type.id }}" class="form-label fw-semibold">
+                                    {{ form.location_type.label.text }}
+                                </label>
+                                {{ form.location_type(class="form-select" + (" is-invalid" if form.location_type.errors else "")) }}
+                                {% if form.location_type.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.location_type.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Company Information -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-building me-2 text-warning"></i>
+                            Organization Details
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    {{ form.company_name(class="form-control", placeholder="Company/Organization Name") }}
+                                    {{ form.company_name.label(class="form-label") }}
+                                    <div class="form-text">
+                                        <small class="text-muted">Optional - The name of your organization</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="{{ form.logo_file.id }}" class="form-label fw-semibold">
+                                    {{ form.logo_file.label.text }}
+                                </label>
+                                {{ form.logo_file(class="form-control", accept="image/*") }}
+                                {% if form.logo_file.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.logo_file.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">
+                                    <small class="text-muted">Upload a logo file (JPG, PNG, GIF, SVG)</small>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    {{ form.logo_url(class="form-control", placeholder="https://example.com/logo.png") }}
+                                    {{ form.logo_url.label(class="form-label") }}
+                                    <div class="form-text">
+                                        <small class="text-muted">Or provide a URL to your logo</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    {{ form.contact_phone(class="form-control", placeholder="Contact Phone") }}
+                                    {{ form.contact_phone.label(class="form-label") }}
+                                    <div class="form-text">
+                                        <small class="text-muted">Optional - Contact number for event inquiries</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar Settings -->
+            <div class="col-lg-4">
+                <!-- Pricing & Tickets -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-ticket-alt me-2 text-success"></i>
+                            Pricing & Tickets
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.is_free(class="form-check-input", id="is_free_switch") }}
+                                <label class="form-check-label fw-semibold" for="is_free_switch">
+                                    {{ form.is_free.label.text }}
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div id="price_section" class="mb-3" style="display: none;">
+                            <div class="form-floating">
+                                {{ form.price(class="form-control" + (" is-invalid" if form.price.errors else ""), placeholder="0.00", step="0.01") }}
+                                {{ form.price.label(class="form-label") }}
+                                {% if form.price.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.price.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="form-text">
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Payment will be collected at the event
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <div class="form-floating">
+                            {{ form.total_tickets(class="form-control" + (" is-invalid" if form.total_tickets.errors else ""), placeholder="Total Tickets") }}
+                            {{ form.total_tickets.label(class="form-label") }}
+                            {% if form.total_tickets.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.total_tickets.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Access Settings -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-users me-2 text-info"></i>
+                            Access Settings
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.is_public(class="form-check-input", id="is_public_switch") }}
+                                <label class="form-check-label fw-semibold" for="is_public_switch">
+                                    {{ form.is_public.label.text }}
+                                </label>
+                                <div class="form-text">
+                                    <small class="text-muted">Public events appear in the event listing</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-check form-switch">
+                            {{ form.invitation_only(class="form-check-input", id="invitation_only_switch") }}
+                            <label class="form-check-label fw-semibold" for="invitation_only_switch">
+                                {{ form.invitation_only.label.text }}
+                            </label>
+                            {% if form.invitation_only.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.invitation_only.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">
+                                <small class="text-muted">{{ form.invitation_only.description }}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            {{ form.submit(class="btn btn-primary btn-lg") }}
+                            <a href="{% if current_user.is_admin() %}{{ url_for('admin_panel') }}{% else %}{{ url_for('dashboard_creator') }}{% endif %}" 
+                               class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                        </div>
+                        
+                        {% if is_edit %}
+                            <hr>
+                            <div class="alert alert-warning border-0 mb-0">
+                                <div class="d-flex align-items-start">
+                                    <i class="fas fa-exclamation-triangle me-2 mt-1"></i>
+                                    <div>
+                                        <small><strong>Note:</strong> Editing an approved event will require re-approval from an admin.</small>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.form-floating > .form-control:focus ~ label,
+.form-floating > .form-control:not(:placeholder-shown) ~ label {
+    opacity: .65;
+    transform: scale(.85) translateY(-.5rem) translateX(.15rem);
+}
+
+.form-switch .form-check-input {
+    width: 2em;
+    height: 1em;
+}
+
+.form-switch .form-check-input:checked {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.card {
+    transition: var(--transition);
+}
+
+.card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+@media (max-width: 992px) {
+    .col-lg-4 .card {
+        margin-bottom: 1.5rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Price section toggle
+    const isFreeSwitch = document.getElementById('is_free_switch');
+    const priceSection = document.getElementById('price_section');
+    
+    function togglePriceSection() {
+        if (isFreeSwitch.checked) {
+            priceSection.style.display = 'none';
+        } else {
+            priceSection.style.display = 'block';
+        }
+    }
+    
+    // Initial state
+    togglePriceSection();
+    
+    // Listen for changes
+    isFreeSwitch.addEventListener('change', togglePriceSection);
+    
+    // Invitation only vs public event
+    const isPublicSwitch = document.getElementById('is_public_switch');
+    const invitationOnlySwitch = document.getElementById('invitation_only_switch');
+    
+    invitationOnlySwitch.addEventListener('change', function() {
+        if (this.checked) {
+            isPublicSwitch.checked = false;
+        }
+    });
+    
+    isPublicSwitch.addEventListener('change', function() {
+        if (this.checked) {
+            invitationOnlySwitch.checked = false;
+        }
+    });
+    
+    // Form validation enhancement
+    const form = document.querySelector('form');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        // Check required fields
+        const requiredFields = form.querySelectorAll('[required]');
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                field.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                field.classList.remove('is-invalid');
+            }
+        });
+        
+        // Validate dates
+        const startDate = form.querySelector('#date');
+        const endDate = form.querySelector('#end_date');
+        
+        if (startDate.value && endDate.value) {
+            if (new Date(endDate.value) <= new Date(startDate.value)) {
+                endDate.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                endDate.classList.remove('is-invalid');
+            }
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+            // Scroll to first error
+            const firstError = form.querySelector('.is-invalid');
+            if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                firstError.focus();
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

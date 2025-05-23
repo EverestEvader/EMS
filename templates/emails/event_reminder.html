@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Reminder: {{ event.name }} Tomorrow!</title>
+    <style>
+        /* Email styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+        
+        .email-container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin: 20px;
+        }
+        
+        .email-header {
+            background: linear-gradient(135deg, #ffc107 0%, #ff8c00 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        .email-header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .email-header .icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .email-body {
+            padding: 30px 20px;
+        }
+        
+        .greeting {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333333;
+            margin-bottom: 20px;
+        }
+        
+        .content {
+            margin-bottom: 20px;
+            color: #666666;
+        }
+        
+        .reminder-highlight {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin: 25px 0;
+        }
+        
+        .reminder-highlight .countdown {
+            font-size: 36px;
+            font-weight: 700;
+            color: #e67e22;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .reminder-highlight .countdown-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #856404;
+            margin: 0;
+        }
+        
+        .event-details {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-left: 4px solid #ffc107;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+        
+        .event-details h3 {
+            color: #e67e22;
+            margin: 0 0 15px 0;
+            font-size: 18px;
+        }
+        
+        .detail-row {
+            display: flex;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        
+        .detail-icon {
+            width: 20px;
+            margin-right: 10px;
+            text-align: center;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #333333;
+            min-width: 80px;
+            margin-right: 10px;
+        }
+        
+        .detail-value {
+            color: #666666;
+            flex: 1;
+        }
+        
+        .view-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+            margin: 20px 0;
+            box-shadow: 0 4px 6px rgba(0, 123, 255, 0.3);
+        }
+        
+        .button-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .checklist-box {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-left: 4px solid #28a745;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .checklist-box .checklist-title {
+            font-weight: 600;
+            color: #155724;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .checklist-item {
+            color: #155724;
+            margin: 8px 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .checklist-item .checkmark {
+            margin-right: 8px;
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .email-footer {
+            background-color: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .footer-text {
+            color: #6c757d;
+            font-size: 12px;
+            margin: 0;
+        }
+        
+        .company-info {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .company-info h3 {
+            color: #ffc107;
+            margin: 0 0 10px 0;
+            font-size: 18px;
+        }
+        
+        .contact-info {
+            color: #6c757d;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+        
+        /* Responsive */
+        @media only screen and (max-width: 600px) {
+            .email-container {
+                margin: 10px;
+                border-radius: 0;
+            }
+            
+            .email-header,
+            .email-body {
+                padding: 20px 15px;
+            }
+            
+            .email-header h1 {
+                font-size: 20px;
+            }
+            
+            .reminder-highlight .countdown {
+                font-size: 28px;
+            }
+            
+            .detail-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .detail-label {
+                min-width: auto;
+                margin-bottom: 5px;
+            }
+            
+            .view-button {
+                display: block;
+                margin: 20px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="email-header">
+            <span class="icon">⏰</span>
+            <h1>Event Reminder: Tomorrow!</h1>
+        </div>
+        
+        <!-- Body -->
+        <div class="email-body">
+            <div class="greeting">
+                Hello {{ user.username }},
+            </div>
+            
+            <div class="content">
+                <p>This is a friendly reminder that you are registered for <strong>{{ event.name }}</strong>, which is happening <strong>tomorrow</strong>!</p>
+            </div>
+            
+            <div class="reminder-highlight">
+                <span class="countdown">Tomorrow!</span>
+                <p class="countdown-text">Don't forget about your upcoming event</p>
+            </div>
+            
+            <div class="event-details">
+                <h3>📅 Event Details</h3>
+                
+                <div class="detail-row">
+                    <span class="detail-icon">🎉</span>
+                    <span class="detail-label">Event:</span>
+                    <span class="detail-value">{{ event.name }}</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-icon">📅</span>
+                    <span class="detail-label">Date:</span>
+                    <span class="detail-value">{{ event.date.strftime('%A, %B %d, %Y') }}</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-icon">🕐</span>
+                    <span class="detail-label">Time:</span>
+                    <span class="detail-value">{{ event.date.strftime('%I:%M %p') }} - {{ event.end_date.strftime('%I:%M %p') }}</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-icon">📍</span>
+                    <span class="detail-label">Venue:</span>
+                    <span class="detail-value">{{ event.venue }}</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-icon">👔</span>
+                    <span class="detail-label">Dress Code:</span>
+                    <span class="detail-value">{{ event.dress_code.value.replace('_', ' ').title() }}</span>
+                </div>
+                
+                {% if not event.is_free %}
+                <div class="detail-row">
+                    <span class="detail-icon">💰</span>
+                    <span class="detail-label">Payment:</span>
+                    <span class="detail-value">${{ "%.2f"|format(event.price) }} (to be paid in cash at the event)</span>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="button-container">
+                <a href="{{ event_url }}" class="view-button">View Complete Event Details</a>
+            </div>
+            
+            <div class="checklist-box">
+                <div class="checklist-title">✅ Pre-Event Checklist</div>
+                
+                <div class="checklist-item">
+                    <span class="checkmark">✓</span>
+                    <span>Check the weather and dress appropriately ({{ event.dress_code.value.replace('_', ' ').title() }})</span>
+                </div>
+                
+                <div class="checklist-item">
+                    <span class="checkmark">✓</span>
+                    <span>Plan your route and arrive 15 minutes early</span>
+                </div>
+                
+                <div class="checklist-item">
+                    <span class="checkmark">✓</span>
+                    <span>Bring a valid ID for check-in</span>
+                </div>
+                
+                {% if not event.is_free %}
+                <div class="checklist-item">
+                    <span class="checkmark">✓</span>
+                    <span>Bring ${{ "%.2f"|format(event.price) }} for event payment</span>
+                </div>
+                {% endif %}
+                
+                <div class="checklist-item">
+                    <span class="checkmark">✓</span>
+                    <span>Bring business cards if networking is expected</span>
+                </div>
+                
+                {% if event.contact_phone %}
+                <div class="checklist-item">
+                    <span class="checkmark">✓</span>
+                    <span>Save organizer contact: {{ event.contact_phone }}</span>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="content">
+                <p>If you need to cancel your registration, you can do so from your account on our website. Last-minute cancellations help us manage capacity better.</p>
+                
+                <p>We look forward to seeing you tomorrow!</p>
+                
+                <p><strong>The Corporate Event Hub Team</strong></p>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="email-footer">
+            <div class="company-info">
+                <h3>Corporate Event Hub</h3>
+                <div class="contact-info">
+                    📧 support@corporateeventhub.com<br>
+                    📞 +1 (555) 123-4567<br>
+                    📍 123 Business Ave, Suite 100, Corporate City, BC 12345
+                </div>
+            </div>
+            
+            <p class="footer-text">
+                This reminder was sent to {{ user.email }}.<br>
+                If you have any questions about this event, please contact the event organizer or our support team.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

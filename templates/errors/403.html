@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Access Forbidden - Corporate Event Hub{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8 text-center">
+            <div class="error-page">
+                <!-- Error Icon -->
+                <div class="error-icon mb-4">
+                    <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="60" cy="60" r="58" stroke="#dc3545" stroke-width="4" fill="none"/>
+                        <path d="M40 40L80 80M80 40L40 80" stroke="#dc3545" stroke-width="4" stroke-linecap="round"/>
+                        <circle cx="60" cy="60" r="30" fill="#dc3545" fill-opacity="0.1"/>
+                    </svg>
+                </div>
+                
+                <!-- Error Details -->
+                <h1 class="display-4 fw-bold text-danger mb-3">403</h1>
+                <h2 class="h3 fw-semibold mb-3">Access Forbidden</h2>
+                <p class="lead text-muted mb-4">
+                    You don't have permission to access this resource. This could be because:
+                </p>
+                
+                <!-- Possible Reasons -->
+                <div class="alert alert-warning border-0 text-start mb-4">
+                    <ul class="mb-0">
+                        <li>You need to be logged in to access this page</li>
+                        <li>Your account role doesn't have the required permissions</li>
+                        <li>The resource is restricted to specific users</li>
+                        <li>Your session may have expired</li>
+                    </ul>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('home') }}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-home me-2"></i>Go to Dashboard
+                        </a>
+                        <a href="{{ url_for('profile') }}" class="btn btn-outline-secondary btn-lg">
+                            <i class="fas fa-user me-2"></i>View Profile
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-sign-in-alt me-2"></i>Login
+                        </a>
+                        <a href="{{ url_for('signup') }}" class="btn btn-outline-primary btn-lg">
+                            <i class="fas fa-user-plus me-2"></i>Sign Up
+                        </a>
+                    {% endif %}
+                </div>
+                
+                <!-- Additional Help -->
+                <div class="mt-5">
+                    <h5 class="fw-semibold mb-3">Need Help?</h5>
+                    <p class="text-muted mb-3">
+                        If you believe you should have access to this resource, please contact our support team.
+                    </p>
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="mailto:support@corporateeventhub.com" class="btn btn-sm btn-outline-info">
+                            <i class="fas fa-envelope me-2"></i>Contact Support
+                        </a>
+                        <a href="{{ url_for('index') }}" class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.error-page {
+    padding: var(--spacing-4xl) var(--spacing-2xl);
+}
+
+.error-icon {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.btn-lg {
+    font-size: var(--font-size-lg);
+    padding: var(--spacing-lg) var(--spacing-2xl);
+}
+
+@media (max-width: 768px) {
+    .error-page {
+        padding: var(--spacing-2xl) var(--spacing-lg);
+    }
+    
+    .error-icon svg {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .display-4 {
+        font-size: 3rem;
+    }
+}
+</style>
+{% endblock %}

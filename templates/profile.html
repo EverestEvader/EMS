@@ -1,0 +1,419 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - Corporate Event Hub{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex align-items-center mb-3">
+                <a href="{{ url_for('home') }}" class="btn btn-outline-secondary me-3">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                </a>
+                <div>
+                    <h1 class="display-6 fw-bold mb-0">
+                        <i class="fas fa-user me-2 text-primary"></i>
+                        My Profile
+                    </h1>
+                    <p class="text-muted mb-0">Manage your account information and preferences</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Profile Information -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2 text-primary"></i>
+                        Account Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="profile-field">
+                                <label class="profile-label">Username</label>
+                                <div class="profile-value">
+                                    <i class="fas fa-user me-2 text-muted"></i>
+                                    {{ current_user.username }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="profile-field">
+                                <label class="profile-label">Email Address</label>
+                                <div class="profile-value">
+                                    <i class="fas fa-envelope me-2 text-muted"></i>
+                                    {{ current_user.email }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="profile-field">
+                                <label class="profile-label">Account Role</label>
+                                <div class="profile-value">
+                                    <i class="fas fa-user-tag me-2 text-muted"></i>
+                                    <span class="badge bg-primary fs-6">
+                                        {{ current_user.role.value.replace('_', ' ').title() }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="profile-field">
+                                <label class="profile-label">Member Since</label>
+                                <div class="profile-value">
+                                    <i class="fas fa-calendar-alt me-2 text-muted"></i>
+                                    {{ current_user.created_at.strftime('%B %d, %Y') }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12">
+                            <div class="profile-field">
+                                <label class="profile-label">Account Permissions</label>
+                                <div class="profile-value">
+                                    <div class="row g-2">
+                                        {% if current_user.is_attendee() %}
+                                            <div class="col-auto">
+                                                <span class="badge bg-success">
+                                                    <i class="fas fa-check me-1"></i>Event Registration
+                                                </span>
+                                            </div>
+                                        {% endif %}
+                                        {% if current_user.is_event_creator() %}
+                                            <div class="col-auto">
+                                                <span class="badge bg-info">
+                                                    <i class="fas fa-plus me-1"></i>Event Creation
+                                                </span>
+                                            </div>
+                                        {% endif %}
+                                        {% if current_user.is_admin() %}
+                                            <div class="col-auto">
+                                                <span class="badge bg-danger">
+                                                    <i class="fas fa-cog me-1"></i>System Administration
+                                                </span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity Summary -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-line me-2 text-success"></i>
+                        Activity Summary
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="activity-stat">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <h4 class="text-primary mb-0">{{ current_user.registrations.count() }}</h4>
+                                        <p class="text-muted mb-0">Events Registered</p>
+                                    </div>
+                                    <i class="fas fa-calendar-check fa-2x text-primary opacity-25"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {% if current_user.is_event_creator() %}
+                            <div class="col-md-6">
+                                <div class="activity-stat">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div>
+                                            <h4 class="text-success mb-0">{{ current_user.created_events.count() }}</h4>
+                                            <p class="text-muted mb-0">Events Created</p>
+                                        </div>
+                                        <i class="fas fa-calendar-plus fa-2x text-success opacity-25"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="col-md-6">
+                            <div class="activity-stat">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <h4 class="text-info mb-0">{{ current_user.get_upcoming_events()|length }}</h4>
+                                        <p class="text-muted mb-0">Upcoming Events</p>
+                                    </div>
+                                    <i class="fas fa-clock fa-2x text-info opacity-25"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="activity-stat">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <h4 class="text-warning mb-0">
+                                            {{ (current_user.updated_at.now() - current_user.created_at).days }}
+                                        </h4>
+                                        <p class="text-muted mb-0">Days as Member</p>
+                                    </div>
+                                    <i class="fas fa-user-clock fa-2x text-warning opacity-25"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Quick Actions -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bolt me-2 text-warning"></i>
+                        Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-3">
+                        <a href="{{ url_for('forgot_password') }}" class="btn btn-outline-warning">
+                            <i class="fas fa-key me-2"></i>Change Password
+                        </a>
+                        
+                        {% if current_user.is_event_creator() %}
+                            <a href="{{ url_for('event_create') }}" class="btn btn-outline-success">
+                                <i class="fas fa-plus me-2"></i>Create Event
+                            </a>
+                            <a href="{{ url_for('dashboard_creator') }}" class="btn btn-outline-info">
+                                <i class="fas fa-chart-bar me-2"></i>My Events
+                            </a>
+                        {% endif %}
+                        
+                        <a href="{{ url_for('event_list') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-search me-2"></i>Browse Events
+                        </a>
+                        
+                        {% if current_user.is_admin() %}
+                            <a href="{{ url_for('admin_panel') }}" class="btn btn-outline-danger">
+                                <i class="fas fa-cog me-2"></i>Admin Panel
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account Security -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-shield-alt me-2 text-danger"></i>
+                        Account Security
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="security-item mb-3">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <strong>Password</strong>
+                                <small class="d-block text-muted">Last updated: Unknown</small>
+                            </div>
+                            <span class="badge bg-success">Secure</span>
+                        </div>
+                    </div>
+                    
+                    <div class="security-item mb-3">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <strong>Email Verification</strong>
+                                <small class="d-block text-muted">{{ current_user.email }}</small>
+                            </div>
+                            <span class="badge bg-success">Verified</span>
+                        </div>
+                    </div>
+                    
+                    <div class="security-item">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <strong>Account Status</strong>
+                                <small class="d-block text-muted">Active since {{ current_user.created_at.strftime('%Y') }}</small>
+                            </div>
+                            <span class="badge bg-success">Active</span>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="d-grid">
+                        <a href="{{ url_for('forgot_password') }}" class="btn btn-sm btn-outline-warning">
+                            <i class="fas fa-key me-2"></i>Reset Password
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Support -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-life-ring me-2 text-info"></i>
+                        Support
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">Need help with your account or have questions?</p>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="mailto:support@corporateeventhub.com" class="btn btn-sm btn-outline-info">
+                            <i class="fas fa-envelope me-2"></i>Contact Support
+                        </a>
+                        <a href="#" class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-question-circle me-2"></i>Help Center
+                        </a>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="text-center">
+                        <small class="text-muted">
+                            <i class="fas fa-phone me-1"></i>
+                            Support: +1 (555) 123-4567
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    {% if current_user.registrations.limit(5).all() %}
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-history me-2 text-secondary"></i>
+                            Recent Event Registrations
+                        </h5>
+                        <a href="{{ url_for('home') }}" class="btn btn-sm btn-outline-primary">
+                            View All
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group list-group-flush">
+                            {% for registration in current_user.registrations.limit(5).all() %}
+                                <div class="list-group-item px-0 py-3 border-bottom">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1 fw-semibold">
+                                                <a href="{{ url_for('event_detail', event_id=registration.event.id) }}" 
+                                                   class="text-decoration-none text-dark">
+                                                    {{ registration.event.name }}
+                                                </a>
+                                            </h6>
+                                            <p class="text-muted mb-2 small">
+                                                <i class="fas fa-calendar-alt me-1"></i>
+                                                {{ registration.event.date.strftime('%B %d, %Y at %I:%M %p') }}
+                                            </p>
+                                            <p class="text-muted mb-0 small">
+                                                <i class="fas fa-clock me-1"></i>
+                                                Registered on {{ registration.registered_at.strftime('%B %d, %Y') }}
+                                            </p>
+                                        </div>
+                                        <div class="text-end">
+                                            {% if registration.event.is_upcoming %}
+                                                <span class="badge bg-success">Upcoming</span>
+                                            {% elif registration.event.is_ongoing %}
+                                                <span class="badge bg-warning">Ongoing</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">Past</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.profile-field {
+    padding: var(--spacing-lg);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    background: var(--surface);
+    transition: var(--transition);
+}
+
+.profile-field:hover {
+    border-color: var(--border);
+    box-shadow: var(--shadow-sm);
+}
+
+.profile-label {
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+    display: block;
+    font-size: var(--font-size-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.profile-value {
+    font-size: var(--font-size-base);
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+}
+
+.activity-stat {
+    padding: var(--spacing-xl);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    transition: var(--transition);
+}
+
+.activity-stat:hover {
+    border-color: var(--border);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.security-item {
+    padding: var(--spacing-md) 0;
+}
+
+.list-group-item:last-child {
+    border-bottom: none !important;
+}
+
+@media (max-width: 768px) {
+    .profile-value {
+        font-size: var(--font-size-sm);
+    }
+    
+    .activity-stat h4 {
+        font-size: var(--font-size-2xl);
+    }
+}
+</style>
+{% endblock %}

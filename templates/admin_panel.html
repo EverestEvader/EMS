@@ -1,0 +1,462 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Panel - Corporate Event Hub{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <h1 class="display-6 fw-bold mb-2">
+                <i class="fas fa-cog me-2 text-danger"></i>
+                Admin Panel
+            </h1>
+            <p class="text-muted mb-0">System overview and event management</p>
+        </div>
+        <div class="col-lg-4 text-lg-end">
+            <div class="d-flex gap-2 justify-content-lg-end">
+                <a href="{{ url_for('event_create') }}" class="btn btn-success">
+                    <i class="fas fa-plus me-2"></i>Create Event
+                </a>
+                <a href="{{ url_for('event_list') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-calendar me-2"></i>View Events
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Statistics -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h4 class="fw-semibold mb-3">
+                <i class="fas fa-chart-pie me-2 text-primary"></i>
+                System Overview
+            </h4>
+        </div>
+    </div>
+
+    <!-- User Statistics -->
+    <div class="row g-3 mb-4">
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="stat-number text-primary">{{ stats.user_stats.total_users }}</span>
+                    <i class="fas fa-users fa-2x text-primary opacity-25"></i>
+                </div>
+                <span class="stat-label">Total Users</span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="stat-number text-danger">{{ stats.user_stats.admin_count }}</span>
+                    <i class="fas fa-user-shield fa-2x text-danger opacity-25"></i>
+                </div>
+                <span class="stat-label">Administrators</span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="stat-number text-success">{{ stats.user_stats.creator_count }}</span>
+                    <i class="fas fa-calendar-plus fa-2x text-success opacity-25"></i>
+                </div>
+                <span class="stat-label">Event Creators</span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="stat-number text-info">{{ stats.user_stats.attendee_count }}</span>
+                    <i class="fas fa-user fa-2x text-info opacity-25"></i>
+                </div>
+                <span class="stat-label">Attendees</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Statistics -->
+    <div class="row g-3 mb-4">
+        <div class="col-lg-2 col-md-4 col-6">
+            <div class="stat-card">
+                <span class="stat-number text-primary">{{ stats.event_stats.total_events }}</span>
+                <span class="stat-label">Total Events</span>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-6">
+            <div class="stat-card">
+                <span class="stat-number text-success">{{ stats.event_stats.approved_events }}</span>
+                <span class="stat-label">Approved</span>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-6">
+            <div class="stat-card">
+                <span class="stat-number text-warning">{{ stats.event_stats.pending_events }}</span>
+                <span class="stat-label">Pending</span>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-6">
+            <div class="stat-card">
+                <span class="stat-number text-danger">{{ stats.event_stats.rejected_events }}</span>
+                <span class="stat-label">Rejected</span>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-6">
+            <div class="stat-card">
+                <span class="stat-number text-info">{{ stats.event_stats.upcoming_events }}</span>
+                <span class="stat-label">Upcoming</span>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-6">
+            <div class="stat-card">
+                <span class="stat-number text-secondary">{{ stats.event_stats.past_events }}</span>
+                <span class="stat-label">Past</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Registration Statistics -->
+    <div class="row g-3 mb-5">
+        <div class="col-lg-4">
+            <div class="stat-card">
+                <span class="stat-number text-primary">{{ stats.registration_stats.total_registrations }}</span>
+                <span class="stat-label">Total Registrations</span>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="stat-card">
+                <span class="stat-number text-success">{{ "%.1f"|format(stats.registration_stats.ticket_usage_rate) }}%</span>
+                <span class="stat-label">Ticket Usage Rate</span>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="stat-card">
+                <span class="stat-number text-info">{{ stats.registration_stats.booked_tickets }}/{{ stats.registration_stats.total_tickets }}</span>
+                <span class="stat-label">Tickets Booked</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Management -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-tasks me-2 text-primary"></i>
+                        Event Management
+                    </h5>
+                    <div class="d-flex gap-2">
+                        <select class="form-select form-select-sm" id="statusFilter" style="width: auto;">
+                            <option value="">All Statuses</option>
+                            <option value="pending">Pending Review</option>
+                            <option value="approved">Approved</option>
+                            <option value="rejected">Rejected</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                        <select class="form-select form-select-sm" id="timeFilter" style="width: auto;">
+                            <option value="">All Events</option>
+                            <option value="upcoming">Upcoming</option>
+                            <option value="ongoing">Ongoing</option>
+                            <option value="past">Past</option>
+                        </select>
+                    </div>
+                </div>
+                
+                {% if events %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Event Details</th>
+                                    <th>Creator</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Registrations</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for event in events %}
+                                    <tr class="event-row" 
+                                        data-status="{{ event.status.name.lower() }}" 
+                                        data-time="{% if event.is_upcoming %}upcoming{% elif event.is_ongoing %}ongoing{% else %}past{% endif %}">
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                {% if event.logo_url %}
+                                                    <img src="{{ event.logo_url }}" alt="Logo" class="rounded me-3" style="width: 40px; height: 40px; object-fit: cover;">
+                                                {% else %}
+                                                    <div class="bg-primary bg-opacity-10 text-primary rounded d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                                        <i class="fas fa-calendar-alt"></i>
+                                                    </div>
+                                                {% endif %}
+                                                <div>
+                                                    <h6 class="mb-0">
+                                                        <a href="{{ url_for('event_detail', event_id=event.id) }}" class="text-decoration-none">
+                                                            {{ event.name }}
+                                                        </a>
+                                                    </h6>
+                                                    <small class="text-muted">
+                                                        {{ event.event_type.value.title() }} • {{ event.venue }}
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <strong>{{ event.creator.username }}</strong>
+                                                <small class="d-block text-muted">{{ event.creator.email }}</small>
+                                                {% if event.company_name %}
+                                                    <small class="text-muted">{{ event.company_name }}</small>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <strong>{{ event.date.strftime('%b %d, %Y') }}</strong>
+                                                <small class="d-block text-muted">{{ event.date.strftime('%I:%M %p') }}</small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="status-badge {{ event.status.name.lower() }}">
+                                                {% if event.status.name == 'APPROVED' %}
+                                                    <i class="fas fa-check"></i>
+                                                {% elif event.status.name == 'PENDING' %}
+                                                    <i class="fas fa-clock"></i>
+                                                {% elif event.status.name == 'REJECTED' %}
+                                                    <i class="fas fa-times"></i>
+                                                {% else %}
+                                                    <i class="fas fa-ban"></i>
+                                                {% endif %}
+                                                {{ event.status.value.title() }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="me-3">
+                                                    <strong>{{ event.total_tickets - event.available_tickets }}</strong>
+                                                    <small class="text-muted">/ {{ event.total_tickets }}</small>
+                                                </div>
+                                                <div class="progress flex-grow-1" style="height: 6px; max-width: 60px;">
+                                                    {% set fill_percentage = ((event.total_tickets - event.available_tickets) / event.total_tickets * 100) if event.total_tickets > 0 else 0 %}
+                                                    <div class="progress-bar 
+                                                        {% if fill_percentage < 50 %}bg-danger
+                                                        {% elif fill_percentage < 80 %}bg-warning
+                                                        {% else %}bg-success{% endif %}" 
+                                                         style="width: {{ fill_percentage }}%">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a href="{{ url_for('event_detail', event_id=event.id) }}" 
+                                                   class="btn btn-sm btn-outline-primary" 
+                                                   data-bs-toggle="tooltip" title="View Details">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                
+                                                {% if event.status.name == 'PENDING' %}
+                                                    <form method="POST" action="{{ url_for('admin_approve_event', event_id=event.id) }}" class="d-inline">
+                                                        <button type="submit" class="btn btn-sm btn-outline-success"
+                                                                data-bs-toggle="tooltip" title="Approve Event">
+                                                            <i class="fas fa-check"></i>
+                                                        </button>
+                                                    </form>
+                                                    <form method="POST" action="{{ url_for('admin_reject_event', event_id=event.id) }}" class="d-inline">
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                                data-bs-toggle="tooltip" title="Reject Event"
+                                                                data-confirm="Are you sure you want to reject this event?">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    </form>
+                                                {% endif %}
+                                                
+                                                <a href="{{ url_for('event_edit', event_id=event.id) }}" 
+                                                   class="btn btn-sm btn-outline-warning"
+                                                   data-bs-toggle="tooltip" title="Edit Event">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                
+                                                <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#deleteModal{{ event.id }}"
+                                                        data-bs-toggle="tooltip" title="Delete Event">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                            
+                                            <!-- Delete Modal -->
+                                            <div class="modal fade" id="deleteModal{{ event.id }}" tabindex="-1">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Delete Event</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <p>Are you sure you want to delete <strong>{{ event.name }}</strong>?</p>
+                                                            <div class="alert alert-danger">
+                                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                This action cannot be undone. All registrations will be lost.
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                            <form method="POST" action="{{ url_for('event_delete', event_id=event.id) }}" class="d-inline">
+                                                                <button type="submit" class="btn btn-danger">
+                                                                    <i class="fas fa-trash me-2"></i>Delete Event
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-calendar-times fa-4x text-muted mb-4"></i>
+                        <h4 class="text-muted mb-3">No Events in System</h4>
+                        <p class="text-muted mb-4">No events have been created yet</p>
+                        <a href="{{ url_for('event_create') }}" class="btn btn-success btn-lg">
+                            <i class="fas fa-plus me-2"></i>Create First Event
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.stat-card {
+    transition: var(--transition);
+    cursor: default;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.progress {
+    background-color: var(--gray-200);
+    border-radius: var(--radius-full);
+}
+
+.progress-bar {
+    border-radius: var(--radius-full);
+}
+
+.event-row {
+    transition: var(--transition);
+}
+
+.event-row:hover {
+    background-color: var(--surface-secondary);
+}
+
+.btn-group .btn {
+    border-radius: var(--radius) !important;
+    margin-right: 2px;
+}
+
+.btn-group .btn:last-child {
+    margin-right: 0;
+}
+
+.table th {
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    border-bottom: 2px solid var(--border-light);
+}
+
+@media (max-width: 768px) {
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+    
+    .btn-group {
+        flex-direction: column;
+        gap: 2px;
+    }
+    
+    .btn-group .btn {
+        margin-right: 0;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Filter functionality
+    const statusFilter = document.getElementById('statusFilter');
+    const timeFilter = document.getElementById('timeFilter');
+    const eventRows = document.querySelectorAll('.event-row');
+    
+    function filterEvents() {
+        const statusValue = statusFilter.value.toLowerCase();
+        const timeValue = timeFilter.value.toLowerCase();
+        
+        eventRows.forEach(row => {
+            const rowStatus = row.dataset.status;
+            const rowTime = row.dataset.time;
+            
+            const statusMatch = !statusValue || rowStatus === statusValue;
+            const timeMatch = !timeValue || rowTime === timeValue;
+            
+            if (statusMatch && timeMatch) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        
+        // Update empty state
+        const visibleRows = Array.from(eventRows).filter(row => row.style.display !== 'none');
+        const tableBody = eventRows[0]?.parentElement;
+        
+        if (tableBody) {
+            const existingEmptyRow = tableBody.querySelector('.empty-filter-row');
+            if (existingEmptyRow) {
+                existingEmptyRow.remove();
+            }
+            
+            if (visibleRows.length === 0 && eventRows.length > 0) {
+                const emptyRow = document.createElement('tr');
+                emptyRow.className = 'empty-filter-row';
+                emptyRow.innerHTML = `
+                    <td colspan="6" class="text-center py-4">
+                        <i class="fas fa-search fa-2x text-muted mb-3"></i>
+                        <p class="text-muted mb-0">No events match the selected filters</p>
+                    </td>
+                `;
+                tableBody.appendChild(emptyRow);
+            }
+        }
+    }
+    
+    statusFilter.addEventListener('change', filterEvents);
+    timeFilter.addEventListener('change', filterEvents);
+    
+    // Initialize tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
+{% endblock %}

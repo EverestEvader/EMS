@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Rejected: {{ event.name }}</title>
+    <style>
+        /* Email styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+        
+        .email-container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin: 20px;
+        }
+        
+        .email-header {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        .email-header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .email-header .icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .email-body {
+            padding: 30px 20px;
+        }
+        
+        .greeting {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333333;
+            margin-bottom: 20px;
+        }
+        
+        .content {
+            margin-bottom: 20px;
+            color: #666666;
+        }
+        
+        .rejection-highlight {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            border: 1px solid #dc3545;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin: 25px 0;
+        }
+        
+        .rejection-highlight .status {
+            font-size: 24px;
+            font-weight: 700;
+            color: #721c24;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .rejection-highlight .status-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: #721c24;
+            margin: 0;
+        }
+        
+        .event-details {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-left: 4px solid #dc3545;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+        
+        .event-details h3 {
+            color: #dc3545;
+            margin: 0 0 15px 0;
+            font-size: 18px;
+        }
+        
+        .detail-row {
+            display: flex;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        
+        .detail-icon {
+            width: 20px;
+            margin-right: 10px;
+            text-align: center;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #333333;
+            min-width: 80px;
+            margin-right: 10px;
+        }
+        
+        .detail-value {
+            color: #666666;
+            flex: 1;
+        }
+        
+        .edit-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+            margin: 20px 0;
+            box-shadow: 0 4px 6px rgba(0, 123, 255, 0.3);
+        }
+        
+        .button-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .reasons-box {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-left: 4px solid #ffc107;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .reasons-box .reasons-title {
+            font-weight: 600;
+            color: #856404;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        
+        .reason-item {
+            color: #856404;
+            margin: 10px 0;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .reason-bullet {
+            margin-right: 10px;
+            color: #ffc107;
+            font-weight: bold;
+        }
+        
+        .help-box {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-left: 4px solid #17a2b8;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .help-box .help-title {
+            font-weight: 600;
+            color: #0c5460;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .help-box .help-text {
+            color: #0c5460;
+            margin: 0;
+        }
+        
+        .email-footer {
+            background-color: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .footer-text {
+            color: #6c757d;
+            font-size: 12px;
+            margin: 0;
+        }
+        
+        .company-info {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .company-info h3 {
+            color: #dc3545;
+            margin: 0 0 10px 0;
+            font-size: 18px;
+        }
+        
+        .contact-info {
+            color: #6c757d;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+        
+        /* Responsive */
+        @media only screen and (max-width: 600px) {
+            .email-container {
+                margin: 10px;
+                border-radius: 0;
+            }
+            
+            .email-header,
+            .email-body {
+                padding: 20px 15px;
+            }
+            
+            .email-header h1 {
+                font-size: 20px;
+            }
+            
+            .rejection-highlight .status {
+                font-size: 20px;
+            }
+            
+            .detail-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .detail-label {
+                min-width: auto;
+                margin-bottom: 5px;
+            }
+            
+            .edit-button {
+                display: block;
+                margin: 20px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="email-header">
+            <span class="icon">❌</span>
+            <h1>Event Rejected</h1>
+        </div>
+        
+        <!-- Body -->
+        <div class="email-body">
+            <div class="greeting">
+                Hello {{ user.username }},
+            </div>
+            
+            <div class="content">
+                <p>We regret to inform you that your event <strong>{{ event.name }}</strong> has been <strong>rejected</strong> by our admin team.</p>
+            </div>
+            
+            <div class="rejection-highlight">
+                <span class="status">❌ REJECTED</span>
+                <p class="status-text">Your event did not meet our publication requirements</p>
+            </div>
+            
+            <div class="event-details">
+                <h3>📅 Event Details</h3>
+                
+                <div class="detail-row">
+                    <span class="detail-icon">🎉</span>
+                    <span class="detail-label">Event:</span>
+                    <span class="detail-value">{{ event.name }}</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-icon">📅</span>
+                    <span class="detail-label">Date:</span>
+                    <span class="detail-value">{{ event.date.strftime('%A, %B %d, %Y') }}</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-icon">🕐</span>
+                    <span class="detail-label">Time:</span>
+                    <span class="detail-value">{{ event.date.strftime('%I:%M %p') }} - {{ event.end_date.strftime('%I:%M %p') }}</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-icon">📍</span>
+                    <span class="detail-label">Venue:</span>
+                    <span class="detail-value">{{ event.venue }}</span>
+                </div>
+            </div>
+            
+            <div class="reasons-box">
+                <div class="reasons-title">⚠️ Common Rejection Reasons</div>
+                <p style="color: #856404; margin-bottom: 15px;">The rejection may be due to one or more of the following reasons:</p>
+                
+                <div class="reason-item">
+                    <span class="reason-bullet">•</span>
+                    <span>Incomplete or inaccurate event details</span>
+                </div>
+                
+                <div class="reason-item">
+                    <span class="reason-bullet">•</span>
+                    <span>The event doesn't align with our platform's guidelines</span>
+                </div>
+                
+                <div class="reason-item">
+                    <span class="reason-bullet">•</span>
+                    <span>Scheduling conflicts with other events</span>
+                </div>
+                
+                <div class="reason-item">
+                    <span class="reason-bullet">•</span>
+                    <span>Venue availability issues</span>
+                </div>
+                
+                <div class="reason-item">
+                    <span class="reason-bullet">•</span>
+                    <span>Insufficient description or unclear objectives</span>
+                </div>
+                
+                <div class="reason-item">
+                    <span class="reason-bullet">•</span>
+                    <span>Inappropriate content or format</span>
+                </div>
+            </div>
+            
+            <div class="button-container">
+                <a href="{{ event_url }}" class="edit-button">Edit & Resubmit Event</a>
+            </div>
+            
+            <div class="content">
+                <p><strong>What You Can Do:</strong></p>
+                <ul>
+                    <li>Review and edit your event details carefully</li>
+                    <li>Ensure all required information is complete and accurate</li>
+                    <li>Check that your event complies with our guidelines</li>
+                    <li>Resubmit your event for approval after making changes</li>
+                </ul>
+                
+                <p>After making necessary changes, you can resubmit your event for approval. Each submission is carefully reviewed by our team.</p>
+            </div>
+            
+            <div class="help-box">
+                <div class="help-title">💬 Need Help?</div>
+                <p class="help-text">
+                    If you have any questions about why your event was rejected or need assistance with your submission, please don't hesitate to contact our admin team. We're here to help you create successful events.
+                </p>
+            </div>
+            
+            <div class="content">
+                <p>We appreciate your understanding and look forward to your revised submission.</p>
+                
+                <p><strong>The Corporate Event Hub Team</strong></p>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="email-footer">
+            <div class="company-info">
+                <h3>Corporate Event Hub</h3>
+                <div class="contact-info">
+                    📧 support@corporateeventhub.com<br>
+                    📞 +1 (555) 123-4567<br>
+                    📍 123 Business Ave, Suite 100, Corporate City, BC 12345
+                </div>
+            </div>
+            
+            <p class="footer-text">
+                This notification was sent to {{ user.email }}.<br>
+                If you have any questions about the rejection reason, please contact our admin team.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
