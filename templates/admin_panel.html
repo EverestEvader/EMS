@@ -116,7 +116,7 @@
     </div>
 
     <!-- Registration Statistics -->
-    <div class="row g-3 mb-5">
+    <div class="row g-3 mb-4">
         <div class="col-lg-4">
             <div class="stat-card">
                 <span class="stat-number text-primary">{{ stats.registration_stats.total_registrations }}</span>
@@ -136,6 +136,256 @@
             </div>
         </div>
     </div>
+
+    <!-- Advanced Analytics Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h4 class="fw-semibold mb-3">
+                <i class="fas fa-chart-line me-2 text-success"></i>
+                Advanced Analytics
+            </h4>
+        </div>
+    </div>
+
+    <!-- Event Type Analytics -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-chart-pie me-2 text-primary"></i>
+                        Event Type Distribution
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="eventTypeChart" width="400" height="300"></canvas>
+                    <div class="mt-3">
+                        {% for type, count in stats.analytics.event_type_breakdown.items() %}
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted">{{ type.replace('_', ' ').title() }}</span>
+                            <div class="d-flex align-items-center">
+                                <span class="badge bg-primary me-2">{{ count.total_events }}</span>
+                                <small class="text-success">{{ count.booking_rate }}% fill</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-chart-bar me-2 text-success"></i>
+                        Monthly Activity Trends
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="monthlyTrendsChart" width="400" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Performers -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-trophy me-2 text-warning"></i>
+                        Top Performing Events
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% if stats.analytics.top_performers.events %}
+                        {% for event in stats.analytics.top_performers.events[:5] %}
+                        <div class="d-flex justify-content-between align-items-center mb-3 p-3 bg-light rounded">
+                            <div>
+                                <h6 class="mb-1">{{ event.name }}</h6>
+                                <small class="text-muted">by {{ event.creator }}</small>
+                            </div>
+                            <div class="text-end">
+                                <div class="text-success fw-bold">{{ event.registration_rate }}%</div>
+                                <small class="text-muted">{{ event.booked_tickets }}/{{ event.total_tickets }}</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted text-center py-4">No events available for analysis</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-star me-2 text-info"></i>
+                        Top Event Creators
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% if stats.analytics.top_performers.creators %}
+                        {% for creator in stats.analytics.top_performers.creators[:5] %}
+                        <div class="d-flex justify-content-between align-items-center mb-3 p-3 bg-light rounded">
+                            <div>
+                                <h6 class="mb-1">{{ creator.username }}</h6>
+                                <small class="text-muted">{{ creator.approved_events }} approved events</small>
+                            </div>
+                            <div class="text-end">
+                                <div class="text-primary fw-bold">{{ creator.total_events }}</div>
+                                <small class="text-muted">{{ creator.total_registrations }} attendees</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted text-center py-4">No creators available for analysis</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Revenue Analytics -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-dollar-sign fa-2x text-success mb-3"></i>
+                    <h3 class="text-success mb-2">${{ stats.analytics.revenue_analytics.total_revenue }}</h3>
+                    <p class="text-muted mb-0">Total Revenue Generated</p>
+                    <small class="text-muted">From {{ stats.analytics.revenue_analytics.total_paid_tickets }} paid tickets</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-ticket-alt fa-2x text-primary mb-3"></i>
+                    <h3 class="text-primary mb-2">${{ stats.analytics.revenue_analytics.avg_ticket_price }}</h3>
+                    <p class="text-muted mb-0">Average Ticket Price</p>
+                    <small class="text-muted">{{ stats.analytics.revenue_analytics.paid_events_count }} paid events</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-gift fa-2x text-info mb-3"></i>
+                    <h3 class="text-info mb-2">{{ stats.analytics.revenue_analytics.free_events_count }}</h3>
+                    <p class="text-muted mb-0">Free Events</p>
+                    <small class="text-muted">Community focused events</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript for Charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Event Type Distribution Pie Chart
+        const eventTypeCtx = document.getElementById('eventTypeChart').getContext('2d');
+        const eventTypeData = {
+            {% set event_types = [] %}
+            {% set event_counts = [] %}
+            {% for type, count in stats.analytics.event_type_breakdown.items() %}
+                {% set _ = event_types.append(type.replace('_', ' ').title()) %}
+                {% set _ = event_counts.append(count.total_events) %}
+            {% endfor %}
+            labels: {{ event_types | tojson }},
+            datasets: [{
+                data: {{ event_counts | tojson }},
+                backgroundColor: [
+                    '#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1', '#fd7e14'
+                ],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        };
+        
+        new Chart(eventTypeCtx, {
+            type: 'doughnut',
+            data: eventTypeData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true
+                        }
+                    }
+                }
+            }
+        });
+
+        // Monthly Trends Line Chart
+        const monthlyCtx = document.getElementById('monthlyTrendsChart').getContext('2d');
+        const monthlyData = {
+            {% set months = [] %}
+            {% set users_data = [] %}
+            {% set events_data = [] %}
+            {% set registrations_data = [] %}
+            {% for month in stats.analytics.monthly_trends %}
+                {% set _ = months.append(month.month_name) %}
+                {% set _ = users_data.append(month.users) %}
+                {% set _ = events_data.append(month.events) %}
+                {% set _ = registrations_data.append(month.registrations) %}
+            {% endfor %}
+            labels: {{ months | tojson }},
+            datasets: [{
+                label: 'New Users',
+                data: {{ users_data | tojson }},
+                borderColor: '#007bff',
+                backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                tension: 0.4
+            }, {
+                label: 'Events Created',
+                data: {{ events_data | tojson }},
+                borderColor: '#28a745',
+                backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                tension: 0.4
+            }, {
+                label: 'Registrations',
+                data: {{ registrations_data | tojson }},
+                borderColor: '#ffc107',
+                backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                tension: 0.4
+            }]
+        };
+        
+        new Chart(monthlyCtx, {
+            type: 'line',
+            data: monthlyData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true
+                        }
+                    }
+                }
+            }
+        });
+    </script>
 
     <!-- Event Management -->
     <div class="row">
