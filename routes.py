@@ -169,34 +169,10 @@ def reset_password(token):
 # Event routes
 @app.route('/events')
 def event_list():
-    # Get search and filter parameters
-    search = request.args.get('search', '').strip()
-    event_type = request.args.get('event_type', '').strip()
-    
-    # Base query for public approved events
-    query = Event.query.filter_by(is_public=True, status=EventStatus.APPROVED)
-    
-    # Apply search filter
-    if search:
-        query = query.filter(
-            db.or_(
-                Event.name.ilike(f'%{search}%'),
-                Event.description.ilike(f'%{search}%'),
-                Event.venue.ilike(f'%{search}%')
-            )
-        )
-    
-    # Apply event type filter
-    if event_type:
-        try:
-            event_type_enum = EventType[event_type.upper()]
-            query = query.filter_by(event_type=event_type_enum)
-        except KeyError:
-            pass  # Invalid event type, ignore filter
-    
-    # Order by date and get results
-    events = query.order_by(Event.date.asc()).all()
-    
+    events = Event.query.filter_by(is_public=True,
+                                   status=EventStatus.APPROVED).order_by(
+                                       Event.date.asc()).all()
+
     return render_template('event_list.html', events=events)
 
 
