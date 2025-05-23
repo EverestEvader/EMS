@@ -407,8 +407,42 @@ def admin_panel():
     # Get all events for admin review
     events = Event.query.order_by(Event.created_at.desc()).all()
 
-    # Get statistics
-    stats = get_admin_stats()
+    # Get statistics with error handling
+    try:
+        stats = get_admin_stats()
+    except Exception as e:
+        print(f"Error in analytics: {e}")
+        # Fallback to basic stats
+        stats = {
+            "user_stats": {
+                "total_users": User.query.count(),
+                "admin_count": User.query.filter_by(role=UserRole.ADMIN).count(),
+                "creator_count": User.query.filter_by(role=UserRole.EVENT_CREATOR).count(), 
+                "attendee_count": User.query.filter_by(role=UserRole.ATTENDEE).count()
+            },
+            "event_stats": {
+                "total_events": Event.query.count(),
+                "approved_events": Event.query.filter_by(status=EventStatus.APPROVED).count(),
+                "pending_events": Event.query.filter_by(status=EventStatus.PENDING).count(),
+                "rejected_events": Event.query.filter_by(status=EventStatus.REJECTED).count(),
+                "cancelled_events": Event.query.filter_by(status=EventStatus.CANCELLED).count(),
+                "upcoming_events": 0,
+                "ongoing_events": 0,
+                "past_events": 0
+            },
+            "registration_stats": {
+                "total_registrations": EventRegistration.query.count(),
+                "ticket_usage_rate": 0,
+                "total_tickets": 0,
+                "booked_tickets": 0
+            },
+            "analytics": {
+                "event_type_breakdown": {},
+                "monthly_trends": [],
+                "top_performers": {"events": [], "creators": []},
+                "revenue_analytics": {"total_revenue": 0, "total_paid_tickets": 0, "avg_ticket_price": 0, "paid_events_count": 0, "free_events_count": 0}
+            }
+        }
 
     return render_template('admin_panel.html', events=events, stats=stats)
 
