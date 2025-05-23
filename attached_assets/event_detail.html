@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% block title %}{{ event.name }} - Corporate Event Hub{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <!-- Back Button -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <a href="{{ url_for('event_list') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i>Back to Events
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Event Info -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                {% if event.logo_url %}
+                    <img src="{{ event.logo_url }}" class="card-img-top" alt="{{ event.name }}" style="height: 300px; object-fit: cover;">
+                {% endif %}
+                
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h1 class="h3 mb-2">{{ event.name }}</h1>
+                            <div class="d-flex gap-2 flex-wrap">
+                                {% if event.is_free %}
+                                    <span class="badge bg-success">Free Event</span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark">${{ event.price }}</span>
+                                {% endif %}
+                                <span class="badge bg-info">{{ event.event_type.value.replace('_', ' ').title() }}</span>
+                                <span class="badge bg-secondary">{{ event.location_type.value.replace('_', ' ').title() }}</span>
+                                {% if event.invitation_only %}
+                                    <span class="badge bg-dark">Invitation Only</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% if current_user.is_authenticated and (current_user.is_admin() or current_user.id == event.creator_id) %}
+                            <div class="dropdown">
+                                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-cog"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="{{ url_for('event_edit', event_id=event.id) }}">
+                                        <i class="fas fa-edit me-2"></i>Edit Event
+                                    </a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <form method="POST" action="{{ url_for('event_delete', event_id=event.id) }}" 
+                                              onsubmit="return confirm('Are you sure you want to delete this event?')">
+                                            <button type="submit" class="dropdown-item text-danger">
+                                                <i class="fas fa-trash me-2"></i>Delete Event
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <p class="card-text">{{ event.description }}</p>
+                    
+                    {% if event.company_name %}
+                        <div class="mb-2">
+                            <strong>Organizer:</strong> {{ event.company_name }}
+                        </div>
+                    {% endif %}
+                    
+                    {% if event.contact_phone %}
+                        <div class="mb-2">
+                            <strong>Contact:</strong> {{ event.contact_phone }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Event Details Sidebar -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Event Details
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <strong><i class="fas fa-calendar me-2"></i>Date & Time</strong>
+                        <div class="mt-1">
+                            <div>{{ event.date.strftime('%A, %B %d, %Y') }}</div>
+                            <div class="text-muted">{{ event.date.strftime('%I:%M %p') }} - {{ event.end_date.strftime('%I:%M %p') }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <strong><i class="fas fa-map-marker-alt me-2"></i>Venue</strong>
+                        <div class="mt-1">{{ event.venue }}</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <strong><i class="fas fa-user-tie me-2"></i>Dress Code</strong>
+                        <div class="mt-1">{{ event.dress_code.value.replace('_', ' ').title() }}</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <strong><i class="fas fa-ticket-alt me-2"></i>Tickets</strong>
+                        <div class="mt-1">
+                            {% if event.available_tickets > 0 %}
+                                <span class="text-success">{{ event.available_tickets }} available</span>
+                            {% else %}
+                                <span class="text-danger">Fully booked</span>
+                            {% endif %}
+                            <small class="text-muted d-block">{{ event.total_tickets }} total tickets</small>
+                        </div>
+                    </div>
+                    
+                    {% if not event.is_free %}
+                        <div class="mb-3">
+                            <strong><i class="fas fa-dollar-sign me-2"></i>Price</strong>
+                            <div class="mt-1">${{ event.price }} (Cash payment at event)</div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Registration Action -->
+            {% if current_user.is_authenticated %}
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        {% if is_registered %}
+                            <h6 class="text-success mb-3">
+                                <i class="fas fa-check-circle me-1"></i>You're registered!
+                            </h6>
+                            <form method="POST" action="{{ url_for('event_unregister', event_id=event.id) }}" 
+                                  onsubmit="return confirm('Are you sure you want to cancel your registration?')">
+                                <button type="submit" class="btn btn-outline-danger w-100">
+                                    <i class="fas fa-times me-1"></i>Cancel Registration
+                                </button>
+                            </form>
+                        {% elif event.available_tickets > 0 and event.status.value == 'approved' %}
+                            <form method="POST" action="{{ url_for('event_register', event_id=event.id) }}">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-calendar-plus me-1"></i>Register for Event
+                                </button>
+                            </form>
+                            {% if not event.is_free %}
+                                <small class="text-muted d-block mt-2">
+                                    Payment will be collected in cash at the event
+                                </small>
+                            {% endif %}
+                        {% elif event.available_tickets <= 0 %}
+                            <button class="btn btn-secondary w-100" disabled>
+                                <i class="fas fa-times me-1"></i>Event Full
+                            </button>
+                        {% else %}
+                            <button class="btn btn-secondary w-100" disabled>
+                                <i class="fas fa-clock me-1"></i>Pending Approval
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        <h6 class="mb-3">Ready to register?</h6>
+                        <a href="{{ url_for('login', next=url_for('event_detail', event_id=event.id)) }}" class="btn btn-primary w-100 mb-2">
+                            <i class="fas fa-sign-in-alt me-1"></i>Login to Register
+                        </a>
+                        <small class="text-muted">
+                            Don't have an account? 
+                            <a href="{{ url_for('signup') }}" class="text-decoration-none">Sign up</a>
+                        </small>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Creator Info -->
+            <div class="card shadow-sm mt-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-user me-2"></i>Event Creator
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div>
+                            <div class="fw-semibold">{{ event.creator.username }}</div>
+                            <small class="text-muted">Event Organizer</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

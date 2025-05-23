@@ -1,0 +1,293 @@
+{% extends "base.html" %}
+
+{% block title %}Creator Dashboard - Corporate Event Hub{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="display-6">Creator Dashboard</h1>
+                    <p class="text-muted">Manage your events and view analytics</p>
+                </div>
+                <a href="{{ url_for('event_create') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i>Create New Event
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="card stats-card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3>{{ stats.total_events }}</h3>
+                            <small>Total Events</small>
+                        </div>
+                        <i class="fas fa-calendar fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card stats-card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3>{{ stats.approved_events }}</h3>
+                            <small>Approved Events</small>
+                        </div>
+                        <i class="fas fa-check-circle fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card stats-card bg-warning text-dark">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3>{{ stats.pending_events }}</h3>
+                            <small>Pending Approval</small>
+                        </div>
+                        <i class="fas fa-clock fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card stats-card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3>{{ stats.total_registrations }}</h3>
+                            <small>Total Registrations</small>
+                        </div>
+                        <i class="fas fa-users fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Stats Row -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="card stats-card bg-secondary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3>{{ stats.upcoming_events }}</h3>
+                            <small>Upcoming Events</small>
+                        </div>
+                        <i class="fas fa-arrow-up fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card stats-card bg-dark text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3>{{ stats.past_events }}</h3>
+                            <small>Past Events</small>
+                        </div>
+                        <i class="fas fa-history fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card stats-card bg-danger text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3>{{ stats.expired_events }}</h3>
+                            <small>Expired Events</small>
+                        </div>
+                        <i class="fas fa-times-circle fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card stats-card" style="background: linear-gradient(45deg, #667eea, #764ba2);">
+                <div class="card-body text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3>{{ "%.1f"|format(stats.ticket_usage_rate) }}%</h3>
+                            <small>Ticket Usage Rate</small>
+                        </div>
+                        <i class="fas fa-chart-pie fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Events List -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list me-2"></i>Your Events
+                        <span class="badge bg-secondary ms-2">{{ events|length }}</span>
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if events %}
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Event Name</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                        <th>Registrations</th>
+                                        <th>Available Tickets</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for event in events %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                {% if event.logo_url %}
+                                                    <img src="{{ event.logo_url }}" alt="Logo" class="rounded me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                                                {% else %}
+                                                    <div class="bg-primary text-white rounded d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                                                        <i class="fas fa-calendar"></i>
+                                                    </div>
+                                                {% endif %}
+                                                <div>
+                                                    <div class="fw-semibold">{{ event.name }}</div>
+                                                    <small class="text-muted">{{ event.event_type.value.replace('_', ' ').title() }}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div>{{ event.date.strftime('%b %d, %Y') }}</div>
+                                            <small class="text-muted">{{ event.date.strftime('%I:%M %p') }}</small>
+                                        </td>
+                                        <td>
+                                            {% if event.is_expired %}
+                                                <span class="badge bg-secondary">Expired</span>
+                                            {% elif event.status.value == 'approved' %}
+                                                <span class="badge bg-success">Approved</span>
+                                            {% elif event.status.value == 'pending' %}
+                                                <span class="badge bg-warning text-dark">Pending</span>
+                                            {% elif event.status.value == 'rejected' %}
+                                                <span class="badge bg-danger">Rejected</span>
+                                            {% elif event.status.value == 'cancelled' %}
+                                                <span class="badge bg-dark">Cancelled</span>
+                                            {% endif %}
+                                            
+                                            {% if event.is_past and not event.is_expired %}
+                                                <span class="badge bg-info ms-1">Past</span>
+                                            {% elif event.is_ongoing %}
+                                                <span class="badge bg-success ms-1">Ongoing</span>
+                                            {% elif event.is_upcoming %}
+                                                <span class="badge bg-primary ms-1">Upcoming</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="fw-semibold">{{ event.registration_count }}</span>
+                                            <small class="text-muted">/ {{ event.total_tickets }}</small>
+                                        </td>
+                                        <td>
+                                            {% if event.available_tickets > 0 %}
+                                                <span class="text-success">{{ event.available_tickets }}</span>
+                                            {% else %}
+                                                <span class="text-danger">0 (Full)</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <a href="{{ url_for('event_detail', event_id=event.id) }}" class="btn btn-outline-info" title="View">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                {% if not event.is_expired %}
+                                                    <a href="{{ url_for('event_edit', event_id=event.id) }}" class="btn btn-outline-primary" title="Edit">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                {% endif %}
+                                                <button type="button" class="btn btn-outline-danger" title="Delete" 
+                                                        onclick="confirmDelete({{ event.id }}, '{{ event.name }}')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-calendar-plus fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted mb-3">No Events Created Yet</h5>
+                            <p class="text-muted mb-4">Start by creating your first event to engage with your audience.</p>
+                            <a href="{{ url_for('event_create') }}" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Create Your First Event
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the event "<span id="eventName"></span>"?</p>
+                <p class="text-danger mb-0">
+                    <i class="fas fa-exclamation-triangle me-1"></i>
+                    This action cannot be undone and will remove all registrations.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteForm" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-1"></i>Delete Event
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function confirmDelete(eventId, eventName) {
+    document.getElementById('eventName').textContent = eventName;
+    document.getElementById('deleteForm').action = '/events/' + eventId + '/delete';
+    
+    const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    modal.show();
+}
+</script>
+{% endblock %}
