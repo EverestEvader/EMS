@@ -460,6 +460,161 @@
         </div>
     </div>
 </div>
+
+<!-- JavaScript for Charts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Event Type Performance Chart
+    {% if stats.analytics and stats.analytics.event_type_breakdown %}
+    const eventTypePerformanceCtx = document.getElementById('eventTypePerformanceChart').getContext('2d');
+    const eventTypePerformanceData = {
+        {% set type_names = [] %}
+        {% set fill_rates = [] %}
+        {% for type, data in stats.analytics.event_type_breakdown.items() %}
+            {% if data.count > 0 %}
+                {% set _ = type_names.append(type.replace('_', ' ').title()) %}
+                {% set _ = fill_rates.append(data.fill_rate) %}
+            {% endif %}
+        {% endfor %}
+        labels: {{ type_names | tojson }},
+        datasets: [{
+            label: 'Fill Rate (%)',
+            data: {{ fill_rates | tojson }},
+            backgroundColor: [
+                'rgba(0, 123, 255, 0.8)',
+                'rgba(40, 167, 69, 0.8)',
+                'rgba(255, 193, 7, 0.8)',
+                'rgba(220, 53, 69, 0.8)',
+                'rgba(111, 66, 193, 0.8)',
+                'rgba(253, 126, 20, 0.8)'
+            ],
+            borderColor: [
+                '#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1', '#fd7e14'
+            ],
+            borderWidth: 2
+        }]
+    };
+    
+    new Chart(eventTypePerformanceCtx, {
+        type: 'bar',
+        data: eventTypePerformanceData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.parsed.y + '% fill rate';
+                        }
+                    }
+                }
+            }
+        }
+    });
+    {% endif %}
+
+    // Monthly Performance Trends Chart
+    {% if stats.analytics and stats.analytics.monthly_performance %}
+    const monthlyPerformanceCtx = document.getElementById('monthlyPerformanceChart').getContext('2d');
+    const monthlyPerformanceData = {
+        {% set months = [] %}
+        {% set events_data = [] %}
+        {% set registrations_data = [] %}
+        {% set revenue_data = [] %}
+        {% for month in stats.analytics.monthly_performance %}
+            {% set _ = months.append(month.month_name) %}
+            {% set _ = events_data.append(month.events_created) %}
+            {% set _ = registrations_data.append(month.registrations) %}
+            {% set _ = revenue_data.append(month.revenue) %}
+        {% endfor %}
+        labels: {{ months | tojson }},
+        datasets: [{
+            label: 'Events Created',
+            data: {{ events_data | tojson }},
+            borderColor: '#007bff',
+            backgroundColor: 'rgba(0, 123, 255, 0.1)',
+            tension: 0.4,
+            yAxisID: 'y'
+        }, {
+            label: 'Registrations',
+            data: {{ registrations_data | tojson }},
+            borderColor: '#28a745',
+            backgroundColor: 'rgba(40, 167, 69, 0.1)',
+            tension: 0.4,
+            yAxisID: 'y'
+        }, {
+            label: 'Revenue ($)',
+            data: {{ revenue_data | tojson }},
+            borderColor: '#ffc107',
+            backgroundColor: 'rgba(255, 193, 7, 0.1)',
+            tension: 0.4,
+            yAxisID: 'y1'
+        }]
+    };
+    
+    new Chart(monthlyPerformanceCtx, {
+        type: 'line',
+        data: monthlyPerformanceData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            scales: {
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    beginAtZero: true,
+                    grid: {
+                        drawOnChartArea: false,
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + value;
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true
+                    }
+                }
+            }
+        }
+    });
+    {% endif %}
+</script>
 {% endblock %}
 
 {% block extra_css %}
